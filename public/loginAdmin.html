@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>Apartado de Administrador</title>
+  <style>
+    .success-message {
+      display: none; /* Oculto por defecto */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #28a745; 
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 18px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+    .error-message {
+      display: none; /* Oculto por defecto */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #e7989e; /* Rojo claro */
+      color: #721c24;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 18px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+    .close-btn {
+      width: 15px; /* Tamaño ligeramente más grande */
+      height: 15px;
+      cursor: pointer;
+      margin-left: 11px; /* Mayor separación del mensaje */
+      margin-top: 5px; /* Baja un poco la posición */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #passwordContainer {
+      position: relative;
+      overflow: auto; /* Para que el contenedor reconozca el float */
+      padding-bottom: 5px; /* Espacio entre la línea y el input, ajustable */
+    }
+    #passwordContainer .login__label {
+      display: inline-block;
+      /* Puedes ajustar un margen derecho si lo consideras necesario */
+      margin-right: 20px;
+    }
+    #passwordContainer .login__forgot {
+      float: right;
+      /* Separa el enlace del borde derecho del contenedor */
+      margin-right: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+      <div class="login__content">
+          <img class="login__img" src="./img/admin-wifi.png" alt="Login wifi image" />
+          <form class="login__form" id="loginForm">
+              <center>
+                  <h1 class="login__title"><span>MATRICIANO</span></h1>
+                  <img src="./img/fondo_circulo_logo.png" alt="Logo" class="logo-polar">
+                  <h1 class="login__title"><span>Login</span> de administrador</h1>
+                  <p class="login__description">Inicia sesión como administrador.</p>
+              </center><br>
+              <div class="login__inputs"> 
+                  <div>
+                      <label for="name-admin" class="login__label">Nombres y Apellidos</label>
+                      <input class="login__input" type="text" id="name-admin" placeholder="Ingresa tus nombres y apellidos" required />
+                  </div>
+                  <div>
+                      <label for="email" class="login__label">Correo</label>
+                      <input class="login__input" type="email" id="email" placeholder="Ingresa tu correo electrónico" required />
+                  </div>
+                  <div id="passwordContainer">
+                    <label for="password" class="login__label">Contraseña</label>
+                    <a class="login__forgot" id="forgotLink" href="reestablecerContra.html">¿Olvidaste tu contraseña?</a>
+                    <div class="login__box">
+                      <input class="login__input" type="password" id="password" placeholder="Ingresa tu contraseña" required />
+                      <i class="ri-eye-off-line login__eye" id="input-icon"></i>
+                    </div>
+                  </div>                  
+              </div>
+              <div class="login__buttons">
+                  <button type="submit" class="login__button">Iniciar Sesión</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <!-- Mensaje de éxito -->
+  <div id="successMessage" class="success-message">
+      💻 Inicio de Sesión como administrador exitoso.
+      <img src="./img/cancelar.png" 
+           class="close-btn" onclick="closeMessageAdmin()" alt="Cerrar" />
+  </div>
+  
+  <!-- Mensaje de error -->
+  <div id="errorMessage" class="error-message">
+      ⚠️ Credenciales incorrectas.
+      <img src="./img/cancelar.png" 
+           class="close-btn" onclick="closeErrorMessage()" alt="Cerrar" />
+  </div>
+
+  <script src="./funcionesAdmin.js"></script>
+</body>
+</html>

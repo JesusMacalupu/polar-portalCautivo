@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reestablecer Contraseña</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./stylesContraseña.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <div class="reset-container">
+      <form class="reset-form" id="resetPassForm">
+        <h1 class="reset-title">Cambiar Contraseña</h1>
+        <p class="reset-description">Ingresa tu nueva contraseña a continuación.</p>
+        
+        <!-- Grupo para el correo -->
+        <div class="reset-group">
+          <label for="userEmail" class="reset-label">Correo:</label>
+          <input type="email" id="userEmail" name="email" class="reset-input" placeholder="Ingresa tu correo" required />
+          <button type="button" id="sendCodeBtn" class="reset-button">Enviar Código</button>
+        </div>
+
+        <!-- Grupo para la nueva contraseña -->
+        <div class="reset-group">
+          <label for="newPwd" class="reset-label">Nueva Contraseña:</label>
+          <input type="password" id="newPwd" name="newPassword" class="reset-input" placeholder="Nueva contraseña" required />
+          <i class="ri-eye-off-line password-toggle-icon" id="newPwd-icon"></i>
+        </div>
+        
+        <!-- Grupo para confirmar la contraseña -->
+        <div class="reset-group">
+          <label for="confirmPwd" class="reset-label">Confirmar Contraseña:</label>
+          <input type="password" id="confirmPwd" name="confirmPassword" class="reset-input" placeholder="Repite la contraseña" required />
+          <i class="ri-eye-off-line password-toggle-icon" id="confirmPwd-icon"></i>
+        </div>
+
+        <!-- Botón para actualizar contraseña (se activará tras verificación) -->
+        <button type="submit" class="reset-button">Reestablecer Contraseña</button>
+        <a href="loginAdmin.html" class="regresar-link">Regresar</a>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal para ingresar el código de verificación -->
+  <div id="verificationModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <p>Ingresa el código de verificación enviado a tu correo:</p>
+      <input type="text" id="verificationCodeInput" placeholder="Código de verificación" required autocomplete="off">
+      <button type="button" id="verifyCodeBtn" class="reset-button">Aceptar</button>
+    </div>
+  </div>
+
+  <script>
+    // Función para mostrar/ocultar la contraseña
+    const showHiddenPassword = (inputId, iconId) => {
+      const input = document.getElementById(inputId);
+      const iconEye = document.getElementById(iconId);
+      iconEye.addEventListener('click', () => {
+        if (input.type === 'password') {
+          input.type = 'text';
+          iconEye.classList.add('ri-eye-line');
+          iconEye.classList.remove('ri-eye-off-line');
+        } else {
+          input.type = 'password';
+          iconEye.classList.remove('ri-eye-line');
+          iconEye.classList.add('ri-eye-off-line');
+        }
+      });
+    };
+
+    showHiddenPassword('newPwd', 'newPwd-icon');
+    showHiddenPassword('confirmPwd', 'confirmPwd-icon');
+
+    // Elementos del modal
+    const modal = document.getElementById("verificationModal");
+    const closeModal = document.getElementById("closeModal");
+    const verifyCodeBtn = document.getElementById("verifyCodeBtn");
+
+    let verificationPassed = false;
+
+    // Función para limpiar el campo del código en el modal
+    function clearVerificationInput() {
+      document.getElementById("verificationCodeInput").value = "";
+    }
+
+    // Cuando se hace clic en "Enviar Código", se envía la petición al servidor para generar y enviar el token
+    const sendCodeBtn = document.getElementById("sendCodeBtn");
+    sendCodeBtn.addEventListener("click", async () => {
+      const email = document.getElementById("userEmail").value.trim();
+      if (!email) {
+        alert("Ingresa un correo válido.");
+        return;
+      }
+      try {
+        const response = await fetch("/send_verification_code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message || "Código de verificación enviado.");
+          // Limpia el campo del código en el modal y muestra el modal
+          clearVerificationInput();
+          modal.classList.add("active");
+        } else {
+          alert(result.error || "Error al enviar el código.");
+        }
+      } catch (error) {
+        console.error("Error en la solicitud:", error);
+        alert("Error en la solicitud.");
+      }
+    });
+
+    // Cerrar modal (remueve la clase "active" y limpia el campo)
+    closeModal.addEventListener("click", () => {
+      modal.classList.remove("active");
+      clearVerificationInput();
+    });
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.remove("active");
+        clearVerificationInput();
+      }
+    });
+
+    // Cuando se hace clic en "Aceptar" en el modal, se envía la petición para verificar el código
+    verifyCodeBtn.addEventListener("click", async () => {
+      const email = document.getElementById("userEmail").value.trim();
+      const inputCode = document.getElementById("verificationCodeInput").value.trim();
+      if (!inputCode) {
+        alert("Ingresa el código de verificación.");
+        return;
+      }
+      try {
+        const response = await fetch("/check_verification_code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, verificationCode: inputCode })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message); // Ej: "El código que ingresaste es correcto."
+          verificationPassed = true;
+          modal.classList.remove("active");
+          clearVerificationInput();
+        } else {
+          alert(result.error);
+        }
+      } catch (error) {
+        console.error("Error en la verificación:", error);
+        alert("Error en la verificación.");
+      }
+    });
+
+    // Manejo del envío del formulario para actualizar la contraseña
+    document.getElementById("resetPassForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!verificationPassed) {
+        alert("Primero debes verificar el código enviado a tu correo.");
+        return;
+      }
+      const email = document.getElementById("userEmail").value.trim();
+      const newPassword = document.getElementById("newPwd").value;
+      const confirmPassword = document.getElementById("confirmPwd").value;
+      try {
+        const response = await fetch("/update_password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, newPassword, confirmPassword })
+        });
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message);
+          // Limpia todos los campos del formulario
+          document.getElementById("resetPassForm").reset();
+          verificationPassed = false;
+        } else {
+          alert(result.error);
+        }
+      } catch (error) {
+        console.error("Error al actualizar la contraseña:", error);
+        alert("Error en la solicitud.");
+      }
+    });
+  </script>
+</body>
+</html>

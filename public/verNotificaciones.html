@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todas las Notificaciones</title>
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2980b9;
+      --background-color: #f5f7fa;
+      --card-color: #ffffff;
+      --text-color: #333333;
+      --border-color: #e0e0e0;
+      --unread-color: #f0f8ff;
+      --success-color: #2ecc71;
+      --danger-color: #e74c3c;
+      --birthday-color: #FFD700;
+      --welcome-color: #3498db;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+        background-image: url('./img/fondoPolar.png');
+        background-size: cover;
+        background-position: center calc(50% + 1.1cm);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        color: var(--text-color);
+        line-height: 1.6;
+        padding: 20px;
+        min-height: 100vh;
+    }
+    
+    .notification-container {
+      max-width: 900px;
+      margin: 30px auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      border: 4px solid black;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      backdrop-filter: blur(5px);
+    }
+    
+    .notification-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      border-bottom: 3px solid var(--border-color);
+    }
+    
+    .notification-header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .notification-actions {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background-color: rgba(249, 249, 249, 0.8);
+    }
+    
+    .mark-all-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .mark-all-btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-1px);
+    }
+    
+    .notification-count {
+      font-weight: 500;
+      color: var(--text-color);
+      background-color: rgba(255,255,255,0.7);
+      padding: 3px 10px;
+      border-radius: 15px;
+    }
+    
+    .notification-list {
+      max-height: 500px;
+      overflow-y: auto;
+      background-color: rgba(255,255,255,0.8);
+    }
+    
+    .notification-item {
+      padding: 15px 20px 15px 60px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: flex-start;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .notification-item.unread {
+      background-color: var(--unread-color);
+    }
+    
+    .notification-item:hover {
+      background-color: rgba(245, 245, 245, 0.9);
+    }
+    
+    .notification-icon {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      font-size: 24px;
+    }
+    
+    .notification-content {
+      flex-grow: 1;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .notification-message {
+      color: #555;
+      margin-bottom: 5px;
+    }
+    
+    .notification-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #777;
+    }
+    
+    .notification-actions-right {
+      display: flex;
+      align-items: center;
+    }
+    
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      margin-left: 15px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .delete-btn:hover {
+      color: var(--danger-color);
+      transform: scale(1.1);
+    }
+    
+    .read-indicator {
+      width: 10px;
+      height: 10px;
+      background-color: var(--primary-color);
+      border-radius: 50%;
+      margin-left: 15px;
+      flex-shrink: 0;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+    }
+    
+    .notification-footer {
+      padding: 20px;
+      text-align: center;
+      border-top: 3px solid var(--border-color);
+      background-color: rgba(249, 249, 249, 0.8);
+    }
+    
+    .back-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .back-btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: #777;
+      background-color: rgba(255,255,255,0.7);
+    }
+    
+    /* Estilos específicos para tipos de notificaciones */
+    .birthday-notification {
+      border-left: 4px solid var(--birthday-color);
+      background-color: rgba(255, 215, 0, 0.08);
+    }
+    
+    .birthday-notification .notification-title {
+      color: #FF8C00;
+    }
+    
+    .birthday-notification .notification-icon {
+      color: #FF8C00;
+    }
+    
+    .welcome-notification {
+      border-left: 4px solid var(--welcome-color);
+      background-color: rgba(52, 152, 219, 0.08);
+    }
+    
+    .welcome-notification .notification-title {
+      color: var(--welcome-color);
+    }
+    
+    .welcome-notification .notification-icon {
+      color: var(--welcome-color);
+    }
+    
+    .system-notification {
+      border-left: 4px solid var(--primary-color);
+      background-color: rgba(52, 152, 219, 0.08);
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+        background-attachment: scroll;
+      }
+      
+      .notification-container {
+        margin: 15px auto;
+        border-width: 2px;
+      }
+      
+      .notification-item {
+        padding: 15px 15px 15px 50px;
+      }
+      
+      .notification-icon {
+        left: 15px;
+        font-size: 20px;
+      }
+    }
+
+    /*** Boton de notificaciones para enviar ***/
+    .send-birthday-btn {
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .send-birthday-btn:hover {
+      background-color: #cc0000;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .send-birthday-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+    }
+    
+    .pulse-effect {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 68, 68, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="notification-container">
+    <div class="notification-header">
+      <h1>Historial de Notificaciones</h1>
+    </div>
+    
+    <div class="notification-actions">
+      <button class="mark-all-btn" id="markAllReadBtn">Marcar todas como leídas</button>
+      <span class="notification-count" id="notificationCount">0 notificaciones no leídas</span>
+    </div>
+    
+    <div class="notification-list" id="notificationList">
+      <div class="empty-state">Cargando notificaciones...</div>
+    </div>
+    
+    <div class="notification-footer">
+      <button class="back-btn" id="backBtn">Regresar al Dashboard</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const backBtn = document.getElementById('backBtn');
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+        const notificationList = document.getElementById('notificationList');
+        const notificationCount = document.getElementById('notificationCount');
+        
+        // Cargar notificaciones
+        loadAllNotifications();
+        
+        // Botón de regresar
+        backBtn.addEventListener('click', function() {
+            window.location.href = 'adminDashboard.html';
+        });
+        
+        // Marcar todas como leídas
+        markAllReadBtn.addEventListener('click', function() {
+            markAllNotificationsAsRead();
+        });
+        
+        // Función para cargar todas las notificaciones
+        async function loadAllNotifications() {
+            try {
+                const adminName = localStorage.getItem('adminName') || 'Administrador';
+                const response = await fetch(`/api/all-notifications?adminName=${encodeURIComponent(adminName)}`);
+                
+                if (!response.ok) throw new Error('Error al cargar notificaciones');
+                
+                const notifications = await response.json();
+                renderNotifications(notifications);
+            } catch (error) {
+                console.error('Error:', error);
+                notificationList.innerHTML = `
+                    <div class="empty-state">
+                        Error al cargar notificaciones. Por favor intente nuevamente.
+                    </div>
+                `;
+            }
+        }
+        
+        // Función para renderizar notificaciones
+        function renderNotifications(notifications) {
+            if (notifications.length === 0) {
+                notificationList.innerHTML = `
+                    <div class="empty-state">
+                        No hay notificaciones para mostrar.
+                    </div>
+                `;
+                notificationCount.textContent = '0 notificaciones no leídas';
+                return;
+            }
+            
+            let unreadCount = 0;
+            notificationList.innerHTML = '';
+            
+            notifications.forEach(notification => {
+                if (!notification.read) unreadCount++;
+                
+                const notificationItem = document.createElement('div');
+                notificationItem.className = `notification-item ${notification.read ? '' : 'unread'} ${notification.type || 'system'}-notification`;
+                notificationItem.dataset.id = notification.id;
+                
+                // Verificar si es una notificación de cumpleaños
+                const isBirthdayNotification = notification.type === 'birthday';
+                
+                notificationItem.innerHTML = `
+                    <div class="notification-icon">${notification.icon || '🔔'}</div>
+                    <div class="notification-content">
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-message">${notification.message}</div>
+                        <div class="notification-meta">
+                            <span class="notification-time">${notification.time || 'Reciente'}</span>
+                            <div class="notification-actions-right">
+                                ${notification.read ? '' : '<span class="read-indicator"></span>'}
+                                ${isBirthdayNotification ? '<button class="send-birthday-btn pulse-effect">Enviar WhatsApp</button>' : ''}
+                                <button class="delete-btn" title="Eliminar notificación">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                notificationList.appendChild(notificationItem);
+                
+                // Evento para eliminar
+                const deleteBtn = notificationItem.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    deleteNotification(notification.id);
+                });
+                
+                // Evento para enviar WhatsApp si es cumpleaños
+                if (isBirthdayNotification) {
+                    const sendBtn = notificationItem.querySelector('.send-birthday-btn');
+                    sendBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        sendBirthdayWhatsApp(notification);
+                    });
+                }
+            });
+            
+            // Actualizar contador
+            notificationCount.textContent = `${unreadCount} notificación${unreadCount !== 1 ? 'es' : ''} no leída${unreadCount !== 1 ? 's' : ''}`;
+        }
+        
+        // Función para enviar WhatsApp de cumpleaños
+        async function sendBirthdayWhatsApp(notification) {
+            try {
+                // Extraer el nombre del mensaje (asumiendo formato "Hoy es el cumpleaños de [Nombre]")
+                const userNameMatch = notification.message.match(/de (.*)/);
+                if (!userNameMatch || !userNameMatch[1]) {
+                    throw new Error('No se pudo extraer el nombre del usuario');
+                }
+                const userName = userNameMatch[1];
+                
+                const sendBtn = document.querySelector(`.notification-item[data-id="${notification.id}"] .send-birthday-btn`);
+                if (!sendBtn) return;
+                
+                // Actualizar UI
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'Enviando...';
+                sendBtn.classList.remove('pulse-effect');
+                
+                // Llamar al endpoint del servidor
+                const response = await fetch('/api/send-birthday-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ userName })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error al enviar el mensaje');
+                }
+                
+                // Éxito
+                sendBtn.textContent = '✓ Enviado';
+                sendBtn.style.backgroundColor = '#4CAF50';
+                
+                // Mostrar notificación de éxito
+                showToast(`Mensaje enviado a ${userName}`, 'success');
+                
+            } catch (error) {
+                console.error('Error al enviar WhatsApp:', error);
+                
+                const sendBtn = document.querySelector(`.notification-item[data-id="${notification.id}"] .send-birthday-btn`);
+                if (sendBtn) {
+                    sendBtn.textContent = 'Error. Reintentar';
+                    sendBtn.style.backgroundColor = '#ff4444';
+                    
+                    // Mostrar error específico
+                    showToast(`Error al enviar: ${error.message}`, 'error');
+                    
+                    // Restaurar botón después de 3 segundos
+                    setTimeout(() => {
+                        sendBtn.textContent = 'Enviar WhatsApp';
+                        sendBtn.style.backgroundColor = '#25D366';
+                        sendBtn.disabled = false;
+                        sendBtn.classList.add('pulse-effect');
+                    }, 3000);
+                }
+            }
+        }
+        
+        // Función para mostrar notificaciones toast
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+        
+        // Función para marcar todas como leídas
+        async function markAllNotificationsAsRead() {
+            try {
+                const adminName = localStorage.getItem('adminName') || 'Administrador';
+                const response = await fetch(`/api/notifications/mark-all-read?adminName=${encodeURIComponent(adminName)}`, {
+                    method: 'POST'
+                });
+                
+                if (!response.ok) throw new Error('Error al marcar como leídas');
+                
+                // Actualizar UI
+                document.querySelectorAll('.notification-item.unread').forEach(item => {
+                    item.classList.remove('unread');
+                    item.querySelector('.read-indicator')?.remove();
+                });
+                
+                notificationCount.textContent = '0 notificaciones no leídas';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('No se pudieron marcar todas como leídas', 'error');
+            }
+        }
+        
+        // Función para eliminar notificación
+        async function deleteNotification(id) {
+            try {
+                const adminName = localStorage.getItem('adminName') || 'Administrador';
+                const response = await fetch(`/api/notifications/${id}?adminName=${encodeURIComponent(adminName)}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) throw new Error('Error al eliminar notificación');
+                
+                // Eliminar de la UI
+                document.querySelector(`.notification-item[data-id="${id}"]`)?.remove();
+                
+                // Verificar si quedan notificaciones
+                if (document.querySelectorAll('.notification-item').length === 0) {
+                    notificationList.innerHTML = `
+                        <div class="empty-state">
+                            No hay notificaciones para mostrar.
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('No se pudo eliminar la notificación', 'error');
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

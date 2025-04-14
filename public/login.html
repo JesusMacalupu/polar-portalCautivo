@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>Conexión WiFi</title>
+</head>
+<body>
+    <div class="container">
+        <div class="login__content">
+            <img class="login__img" src="./img/fondoPolar.png" alt="Login wifi image"/>
+            <form class="login__form" id="loginForm">
+                <center>
+                    <h1 class="login__title"><span>MATRICIANO</span></h1>
+                    <img src="./img/fondo_circulo_logo.png" alt="Logo" class="logo-polar">
+                    <h1 class="login__title"><span>Bienvenido</span> de nuevo</h1>
+                    <p class="login__description">Por favor, inicia sesión para continuar.</p>
+                </center><br>
+                <div class="login__inputs">
+                    <div>
+                        <label for="full-name" class="login__label">Nombres y Apellidos</label>
+                        <input class="login__input" type="text" id="full-name" placeholder="Ingresa tus nombres y apellidos" required />
+                    </div>
+                    <div>
+                        <label for="birthdate" class="login__label">Fecha de Nacimiento</label>
+                        <input class="login__input" type="date" id="birthdate" required />
+                    </div>
+                    <div>
+                        <label for="email" class="login__label">Correo</label>
+                        <input class="login__input" type="text" id="email" placeholder="Ingresa tu correo electrónico" required pattern="[a-zA-Z0-9ñÑáéíóúÁÉÍÓÚ@._-]+" title="Por favor ingresa un correo válido (se permiten letras, números, ñ y caracteres especiales básicos)"/>
+                    </div>
+                    <div>
+                        <label for="phone" class="login__label">Teléfono</label>
+                        <input class="login__input" type="tel" id="phone" placeholder="Ingresa tu número de teléfono" required maxlength="9" />
+                    </div>
+                </div>
+                <div class="login__buttons">
+                    <button type="submit" class="login__button">Iniciar Sesión</button>
+                </div>
+            </form>
+        </div>
+    </div> 
+
+    <!-- Mensaje de éxito -->
+    <div id="successMessage" class="success-message"></div>
+    <!-- Mensaje de error -->
+    <div id="errorMessage" class="error-message"></div>
+
+    <!-- Bloqueador de Internet -->
+    <div id="internetBlocker">
+        <img src="./img/bloqueadoWifi.png" alt="WiFi Bloqueado" class="blocker-logo">
+        <h2 class="blocker-title">Acceso a Internet Restringido</h2>
+        <p class="blocker-message">Por favor, inicie sesión para acceder a Internet</p>
+        <button onclick="showLoginForm()" class="blocker-button">Inicia Sesión</button>
+    </div>
+
+    <script>
+        function showLoginForm() {
+            document.getElementById('internetBlocker').style.display = 'none';
+            document.querySelector('.main-content').style.display = 'block';
+        }
+    </script>
+
+    <script src="./main.js"></script>
+</body>
+</html>
