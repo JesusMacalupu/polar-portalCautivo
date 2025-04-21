@@ -80,7 +80,7 @@ img {
 
 .login__form {
     margin: auto; /* Cambiado a auto para centrar horizontalmente */
-    padding: 1.5rem; /* Mantén el padding que ya tienes */
+    padding: 1.5rem;
     border-radius: 1rem;
     background-color: hsla(244, 16%, 92%, 0.6);
     border: 2px solid hsla(244, 16%, 92%, 0.75);
