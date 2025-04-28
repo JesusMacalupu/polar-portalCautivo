@@ -31,22 +31,23 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         return;
     }
 
-    const response = await fetch('/loginAdmin', {  
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre, correo, contraseña })
-    });
+    try {
+        const response = await fetch('/loginAdmin', {  
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nombre, correo, contraseña })
+        });
 
-    const data = await response.json();
-    if (data.success) {
-        // Guardar el nombre del administrador en el almacenamiento local
-        localStorage.setItem('adminName', nombre);
-        // Mostrar mensaje de éxito
-        showSuccessMessage(data.message || "💻 Inicio de Sesión como administrador exitoso.");
-        // (El efecto del aro verde se aplicará en adminDashboard.html)
-    } else {
-        // Mostrar mensaje de error
-        showErrorMessage(data.message || "⚠️ Credenciales incorrectas.");
+        const data = await response.json();
+        
+        if (data.success) {
+            localStorage.setItem('adminName', nombre);
+            showSuccessMessage(data.message || "💻 Inicio de Sesión como administrador exitoso.");
+        } else {
+            showErrorMessage(data.message || "⚠️ Credenciales incorrectas.");
+        }
+    } catch (error) {
+        showErrorMessage("❌ Error en la conexión con el servidor");
     }
 });
 
