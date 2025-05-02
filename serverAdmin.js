@@ -10,7 +10,7 @@ const wifi = require('node-wifi');
 const twilio = require('twilio');
 
 const app = express();
-const PORT = 4000;
+const PORT = 3000;
 
 // Inicializa el módulo wifi
 wifi.init({
