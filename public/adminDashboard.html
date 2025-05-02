@@ -349,10 +349,183 @@
         </div>
     </div>
 
-      <div id="limiteUsuariosRed" class="card-perfiles">
-        <h1>Máximo de Usuarios en la Red</h1>
-        
+    <div id="limiteUsuariosRed" class="card-perfiles">
+      <h1>Máximo de Usuarios en la Red</h1>
+      <div class="perfil-lista horizontal-align">
+          <button class="metric-btn" onclick="aplicarLimite()">Aplicar Límite</button>
+          <div class="quick-stats">
+              <span class="stat-badge"><i class="fas fa-users"></i> <span id="currentUsers">0</span>/<span id="maxAllowed">0</span></span>
+              <span class="status-dot" id="statusIndicator"></span>
+          </div>
       </div>
+
+      <div id="limiteMaximoContainer" class="limiteMaximo">
+          <h2 class="text-center">Configuración Avanzada de Límites</h2>
+          
+          <div class="tabs">
+              <button class="tab-btn active" onclick="openTab('basicTab')">Configuración Básica</button>
+              <button class="tab-btn" onclick="openTab('advancedTab')">Opciones Avanzadas</button>
+              <button class="tab-btn" onclick="openTab('historyTab')">Historial</button>
+          </div>
+          <br>
+          <form id="limiteForm" class="limite-form">
+              <!-- Pestaña Básica -->
+              <div id="basicTab" class="tab-content active">
+                  <div class="cards-container">
+                      <div class="config-card">
+                          <h3><i class="fas fa-sliders-h"></i> Límites</h3>
+                          <div class="form-group">
+                              <label for="maxUsuarios">Máximo de usuarios:</label>
+                              <div class="input-with-actions">
+                                  <input type="number" id="maxUsuarios" min="1" max="1000" class="form-control" required>
+                                  <button type="button" class="input-btn" onclick="suggestOptimal()"><i class="fas fa-magic"></i> Sugerir</button>
+                              </div>
+                              <div class="range-slider">
+                                  <input type="range" min="1" max="1000" value="100" class="slider" id="maxRange" oninput="updateMaxInput()">
+                              </div>
+                          </div>
+                          
+                          <div class="form-group">
+                              <label for="priorityMode">Modo de prioridad:</label>
+                              <select id="priorityMode" class="form-control">
+                                  <option value="fifo">Primero en entrar, primero en salir</option>
+                                  <option value="priority">Por prioridad de usuario</option>
+                                  <option value="vip">Acceso VIP primero</option>
+                              </select>
+                          </div>
+                      </div>
+                      
+                      <div class="status-card">
+                          <h3><i class="fas fa-chart-line"></i> Estadísticas en Tiempo Real</h3>
+                          <div class="usuarios-info">
+                              <div class="usuarios-count" id="liveUserCount">0</div>
+                              <div class="usuarios-label">Usuarios activos ahora</div>
+                          </div>
+                          <div class="usage-meter">
+                              <div class="meter-bar" id="usageBar"></div>
+                              <div class="meter-text" id="usageText">0% de capacidad</div>
+                          </div>
+                          <div class="stats-grid">
+                              <div class="stat-item">
+                                  <div class="stat-value" id="peakToday">0</div>
+                                  <div class="stat-label">Máximo hoy</div>
+                              </div>
+                              <div class="stat-item">
+                                  <div class="stat-value" id="avgUsage">0</div>
+                                  <div class="stat-label">Promedio</div>
+                              </div>
+                          </div>
+                          <div class="last-update" id="lastUpdateTime">Actualizando datos...</div>
+                      </div>
+                  </div>
+                  
+                  <div class="form-group check-group">
+                      <input type="checkbox" id="notificar" checked>
+                      <label for="notificar">Notificaciones en tiempo real</label>
+                      <div class="notification-options" id="notifOptions">
+                          <select id="notifMethod" class="form-control">
+                              <option value="email">Email</option>
+                              <option value="popup">Popup en sistema</option>
+                              <option value="both">Ambos</option>
+                          </select>
+                          <input type="text" id="notifEmail" class="form-control" placeholder="Email para notificaciones">
+                      </div>
+                  </div>
+              </div>
+              
+              <!-- Pestaña Avanzada -->
+              <div id="advancedTab" class="tab-content">
+                  <div class="advanced-options">
+                      <h3 style="color: black;"><i class="fas fa-cog"></i> Configuración Avanzada</h3>
+                      
+                      <div class="form-group">
+                          <label for="timeLimits">Límites por horario:</label>
+                          <div class="time-slots">
+                              <div class="time-slot">
+                                  <select class="time-select">
+                                      <option>00:00 - 08:00</option>
+                                      <option selected>08:00 - 18:00</option>
+                                      <option>18:00 - 00:00</option>
+                                  </select>
+                                  <input type="number" class="form-control small-input" placeholder="Límite">
+                              </div>
+                              <button type="button" class="add-time-btn"><i class="fas fa-plus"></i> Añadir horario</button>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group">
+                          <label>Excepciones:</label>
+                          <div class="exceptions-list">
+                              <div class="exception-item">
+                                  <select class="exception-type">
+                                      <option>Usuario específico</option>
+                                      <option>Grupo de usuarios</option>
+                                      <option>Departamento</option>
+                                  </select>
+                                  <input type="text" class="form-control" placeholder="ID/Nombre">
+                                  <button type="button" class="remove-exception"><i class="fas fa-times"></i></button>
+                              </div>
+                              <button type="button" class="add-exception-btn"><i class="fas fa-plus"></i> Añadir excepción</button>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group">
+                          <label for="overflowAction">Acción al alcanzar límite:</label>
+                          <select id="overflowAction" class="form-control">
+                              <option value="deny">Denegar nuevos accesos</option>
+                              <option value="queue">Poner en cola de espera</option>
+                              <option value="kick">Desconectar usuario inactivo</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              
+              <!-- Pestaña Historial -->
+              <div id="historyTab" class="tab-content">
+                  <h3 style="color: black;"><i class="fas fa-history"></i> Historial de Cambios</h3>
+                  <div class="history-container">
+                      <div class="history-filters">
+                          <select class="form-control">
+                              <option>Últimos 7 días</option>
+                              <option>Este mes</option>
+                              <option>Personalizado</option>
+                          </select>
+                          <input type="text" class="form-control" placeholder="Buscar...">
+                      </div>
+                      <div class="history-list" id="historyList">
+                          <!-- Los elementos de historial se generarán con JS -->
+                      </div>
+                      <div class="history-pagination">
+                          <button type="button" class="page-btn"><i class="fas fa-chevron-left"></i></button>
+                          <span class="page-info">Página 1 de 1</span>
+                          <button type="button" class="page-btn"><i class="fas fa-chevron-right"></i></button>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="form-footer">
+                  <div class="form-actions">
+                      <button type="button" class="btn-test" onclick="testSettings()"><i class="fas fa-vial"></i> Probar configuración</button>
+                      <button type="submit" class="btn-confirmar"><i class="fas fa-save"></i> Guardar cambios</button>
+                      <button type="button" class="btn-regresar" onclick="ocultarLimite()"><i class="fas fa-times"></i> Cancelar</button>
+                  </div>
+              </div>
+          </form>
+      </div>
+  </div>
+  
+  <!-- Modal de confirmación -->
+  <div id="confirmModal" class="modal-administrador" style="display: none;">
+    <div class="modal-administrador-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle">Confirmar cambios</h3>
+      <p id="modalMessage">¿Está seguro que desea aplicar estos cambios?</p>
+      <div class="modal-administrador-actions">
+        <button class="btn-confirmar" onclick="confirmChanges()">Confirmar</button>
+        <button class="btn-regresar" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>  
 
       <div id="metricasRed" class="card-perfiles">
         <h1>Métricas de Uso de la Red</h1>
@@ -470,7 +643,7 @@
                 </div>
             </div>
           </div><br>
-          <button class="btn-regresar" onclick="regresarMetricas()">Regresar</button>
+          <button class="btn-regresar" onclick="regresarMetricas()" style="display: block; margin: 0 auto;">Regresar</button><br>
         </div>
       </div>
 

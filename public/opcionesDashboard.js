@@ -983,3 +983,228 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.contenedor-dispositivos').style.display = 'none';
     iniciarActualizacionAutomatica();
 });
+
+/***** LIMITE MAXIMO DE USUARIOS ******/ 
+
+// Variables globales
+let currentUsers = 87;
+let maxUsers = 100;
+let updateInterval;
+
+// Inicialización
+document.addEventListener('DOMContentLoaded', function() {
+    updateUserStats();
+    loadHistory();
+    simulateRealTimeUpdates();
+    
+    // Mostrar/ocultar opciones de notificación
+    document.getElementById('notificar').addEventListener('change', function() {
+        document.getElementById('notifOptions').style.display = this.checked ? 'flex' : 'none';
+    });
+    
+    // Inicializar valores del formulario
+    document.getElementById('maxUsuarios').value = maxUsers;
+    document.getElementById('maxRange').value = maxUsers;
+});
+
+// Funciones principales
+function aplicarLimite() {
+    const limiteDiv = document.getElementById('limiteMaximoContainer');
+    limiteDiv.style.display = 'block';
+    updateUserStats();
+}
+
+function ocultarLimite() {
+    const limiteDiv = document.getElementById('limiteMaximoContainer');
+    limiteDiv.style.display = 'none';
+    document.getElementById('limiteForm').reset();
+    document.getElementById('maxUsuarios').value = maxUsers;
+    document.getElementById('maxRange').value = maxUsers;
+}
+
+function openTab(tabId) {
+    // Ocultar todos los contenidos de pestañas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Desactivar todos los botones de pestañas
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Mostrar la pestaña seleccionada
+    document.getElementById(tabId).classList.add('active');
+    
+    // Activar el botón de la pestaña seleccionada
+    event.currentTarget.classList.add('active');
+}
+
+function updateMaxInput() {
+    const slider = document.getElementById('maxRange');
+    const input = document.getElementById('maxUsuarios');
+    input.value = slider.value;
+}
+
+function suggestOptimal() {
+    // Lógica para sugerir un límite óptimo basado en el uso histórico
+    const optimal = Math.min(150, Math.max(50, Math.ceil(currentUsers * 1.3)));
+    document.getElementById('maxUsuarios').value = optimal;
+    document.getElementById('maxRange').value = optimal;
+    
+    // Mostrar feedback
+    alert(`Se ha sugerido un límite de ${optimal} usuarios basado en el uso actual.`);
+}
+
+function updateUserStats() {
+    // Actualizar estadísticas en tiempo real
+    document.getElementById('currentUsers').textContent = currentUsers;
+    document.getElementById('maxAllowed').textContent = maxUsers;
+    document.getElementById('liveUserCount').textContent = currentUsers;
+    
+    // Actualizar barra de uso
+    const usagePercent = Math.min(100, Math.round((currentUsers / maxUsers) * 100));
+    document.getElementById('usageBar').style.width = `${usagePercent}%`;
+    document.getElementById('usageText').textContent = `${usagePercent}% de capacidad`;
+    
+    // Actualizar indicador de estado
+    const indicator = document.getElementById('statusIndicator');
+    indicator.className = 'status-dot';
+    
+    if (usagePercent >= 90) {
+        indicator.classList.add('danger');
+    } else if (usagePercent >= 70) {
+        indicator.classList.add('warning');
+    } else {
+        indicator.classList.add('active');
+    }
+    
+    // Actualizar estadísticas
+    document.getElementById('peakToday').textContent = Math.max(currentUsers, 95);
+    document.getElementById('avgUsage').textContent = Math.round(currentUsers * 0.85);
+    
+    // Actualizar timestamp
+    const now = new Date();
+    document.getElementById('lastUpdateTime').textContent = `Actualizado: ${now.toLocaleTimeString()}`;
+}
+
+function simulateRealTimeUpdates() {
+    // Simular cambios en el número de usuarios conectados
+    updateInterval = setInterval(() => {
+        // Variación aleatoria +/- 5 usuarios
+        const variation = Math.floor(Math.random() * 10) - 5;
+        currentUsers = Math.max(1, currentUsers + variation);
+        
+        // Actualizar la interfaz
+        updateUserStats();
+    }, 5000);
+}
+
+function loadHistory() {
+    const historyList = document.getElementById('historyList');
+    historyList.innerHTML = '';
+    
+    // Datos de ejemplo para el historial
+    const historyData = [
+        { action: 'Límite cambiado', user: 'Admin', time: 'Hace 2 horas', value: '100 → 120' },
+        { action: 'Configuración guardada', user: 'Juan Pérez', time: 'Ayer', value: 'Notificaciones activadas' },
+        { action: 'Límite cambiado', user: 'Sistema', time: '12/05/2023', value: '120 → 100' },
+        { action: 'Excepción añadida', user: 'Admin', time: '10/05/2023', value: 'Usuario ID: 45' },
+        { action: 'Configuración probada', user: 'Ana Gómez', time: '08/05/2023', value: 'Test exitoso' }
+    ];
+    
+    // Generar elementos del historial
+    historyData.forEach(item => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+            <div class="history-details">
+                <div class="history-action">${item.action}</div>
+                <div class="history-user">Por ${item.user} • <span class="history-time">${item.time}</span></div>
+            </div>
+            <div class="history-value">${item.value}</div>
+        `;
+        historyList.appendChild(historyItem);
+    });
+}
+
+function testSettings() {
+    // Simular prueba de configuración
+    const newLimit = document.getElementById('maxUsuarios').value;
+    const priorityMode = document.getElementById('priorityMode').value;
+    
+    // Mostrar resultados de prueba en modal
+    document.getElementById('modalTitle').textContent = 'Resultados de la Prueba';
+    document.getElementById('modalMessage').innerHTML = `
+        <p>La configuración se ha probado exitosamente:</p>
+        <ul>
+            <li>Nuevo límite: <strong>${newLimit} usuarios</strong></li>
+            <li>Modo de prioridad: <strong>${getPriorityModeName(priorityMode)}</strong></li>
+        </ul>
+        <p>Se recomienda guardar los cambios para aplicarlos al sistema.</p>
+    `;
+    
+    document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function getPriorityModeName(value) {
+    const modes = {
+        'fifo': 'Primero en entrar, primero en salir',
+        'priority': 'Por prioridad de usuario',
+        'vip': 'Acceso VIP primero'
+    };
+    return modes[value] || value;
+}
+
+function confirmChanges() {
+    // Guardar los cambios
+    maxUsers = document.getElementById('maxUsuarios').value;
+    
+    // Actualizar la interfaz
+    updateUserStats();
+    
+    // Cerrar modal y mostrar feedback
+    closeModal();
+    alert('Los cambios se han aplicado exitosamente.');
+    
+    // Añadir al historial
+    addHistoryItem('Límite cambiado', maxUsers);
+}
+
+function addHistoryItem(action, value) {
+    const historyList = document.getElementById('historyList');
+    const now = new Date();
+    
+    const historyItem = document.createElement('div');
+    historyItem.className = 'history-item';
+    historyItem.innerHTML = `
+        <div class="history-details">
+            <div class="history-action">${action}</div>
+            <div class="history-user">Por Admin • <span class="history-time">Ahora mismo</span></div>
+        </div>
+        <div class="history-value">${value}</div>
+    `;
+    
+    historyList.insertBefore(historyItem, historyList.firstChild);
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+}
+
+// Manejar el envío del formulario
+document.getElementById('limiteForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const newLimit = document.getElementById('maxUsuarios').value;
+    
+    if(newLimit < 1 || newLimit > 1000) {
+        alert('Por favor ingrese un valor válido entre 1 y 1000');
+        return;
+    }
+    
+    // Mostrar modal de confirmación
+    document.getElementById('modalTitle').textContent = 'Confirmar Cambios';
+    document.getElementById('modalMessage').textContent = `¿Está seguro que desea cambiar el límite máximo a ${newLimit} usuarios?`;
+    document.getElementById('confirmModal').style.display = 'flex';
+});
