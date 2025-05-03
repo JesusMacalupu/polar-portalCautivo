@@ -9,9 +9,9 @@ const PORT = 3000;
 // Configuración de la base de datos
 const dbConfig = {
     user: 'sa',
-    password: '12345678',
-    server: '10.0.0.1',  // IP del servidor
-    port: 55555,         // Puerto
+    password: 'conexionWifi123',
+    server: '10.0.0.1',  
+    port: 55555,         
     database: 'usuariosWifi',
     options: {
         encrypt: false,  

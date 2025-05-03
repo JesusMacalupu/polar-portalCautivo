@@ -20,7 +20,7 @@ wifi.init({
 // Configuración de la base de datos
 const dbConfig = {
     user: 'sa',
-    password: '12345678',
+    password: 'conexionWifi123',
     server: '10.0.0.1',
     port: 55555,
     database: 'usuariosWifi',
