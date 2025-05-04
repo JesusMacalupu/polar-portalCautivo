@@ -986,8 +986,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /***** LIMITE MAXIMO DE USUARIOS ******/ 
 
-// Variables globales
-let currentUsers = 87;
+// Variables globales (valores iniciales en cero)
+let currentUsers = 0;
 let maxUsers = 100;
 let updateInterval;
 
@@ -995,7 +995,11 @@ let updateInterval;
 document.addEventListener('DOMContentLoaded', function() {
     updateUserStats();
     loadHistory();
-    simulateRealTimeUpdates();
+    
+    // Eliminamos la simulación de actualizaciones en tiempo real
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
     
     // Mostrar/ocultar opciones de notificación
     document.getElementById('notificar').addEventListener('change', function() {
@@ -1047,89 +1051,60 @@ function updateMaxInput() {
 }
 
 function suggestOptimal() {
-    // Lógica para sugerir un límite óptimo basado en el uso histórico
-    const optimal = Math.min(150, Math.max(50, Math.ceil(currentUsers * 1.3)));
+    // Lógica para sugerir un límite óptimo (ahora siempre sugiere 100)
+    const optimal = 100;
     document.getElementById('maxUsuarios').value = optimal;
     document.getElementById('maxRange').value = optimal;
     
     // Mostrar feedback
-    alert(`Se ha sugerido un límite de ${optimal} usuarios basado en el uso actual.`);
+    alert(`Se ha sugerido un límite de ${optimal} usuarios (valor fijo).`);
 }
 
 function updateUserStats() {
-    // Actualizar estadísticas en tiempo real
+    // Actualizar estadísticas con valores fijos
     document.getElementById('currentUsers').textContent = currentUsers;
     document.getElementById('maxAllowed').textContent = maxUsers;
     document.getElementById('liveUserCount').textContent = currentUsers;
     
-    // Actualizar barra de uso
-    const usagePercent = Math.min(100, Math.round((currentUsers / maxUsers) * 100));
+    // Actualizar barra de uso (siempre 0% porque currentUsers es 0)
+    const usagePercent = 0;
     document.getElementById('usageBar').style.width = `${usagePercent}%`;
     document.getElementById('usageText').textContent = `${usagePercent}% de capacidad`;
     
-    // Actualizar indicador de estado
+    // Actualizar indicador de estado (siempre verde)
     const indicator = document.getElementById('statusIndicator');
-    indicator.className = 'status-dot';
+    indicator.className = 'status-dot active';
     
-    if (usagePercent >= 90) {
-        indicator.classList.add('danger');
-    } else if (usagePercent >= 70) {
-        indicator.classList.add('warning');
-    } else {
-        indicator.classList.add('active');
-    }
-    
-    // Actualizar estadísticas
-    document.getElementById('peakToday').textContent = Math.max(currentUsers, 95);
-    document.getElementById('avgUsage').textContent = Math.round(currentUsers * 0.85);
+    // Estadísticas fijas en cero
+    document.getElementById('peakToday').textContent = 0;
+    document.getElementById('avgUsage').textContent = 0;
     
     // Actualizar timestamp
     const now = new Date();
     document.getElementById('lastUpdateTime').textContent = `Actualizado: ${now.toLocaleTimeString()}`;
 }
 
-function simulateRealTimeUpdates() {
-    // Simular cambios en el número de usuarios conectados
-    updateInterval = setInterval(() => {
-        // Variación aleatoria +/- 5 usuarios
-        const variation = Math.floor(Math.random() * 10) - 5;
-        currentUsers = Math.max(1, currentUsers + variation);
-        
-        // Actualizar la interfaz
-        updateUserStats();
-    }, 5000);
-}
+// Eliminamos completamente la función simulateRealTimeUpdates()
 
 function loadHistory() {
     const historyList = document.getElementById('historyList');
     historyList.innerHTML = '';
     
-    // Datos de ejemplo para el historial
-    const historyData = [
-        { action: 'Límite cambiado', user: 'Admin', time: 'Hace 2 horas', value: '100 → 120' },
-        { action: 'Configuración guardada', user: 'Juan Pérez', time: 'Ayer', value: 'Notificaciones activadas' },
-        { action: 'Límite cambiado', user: 'Sistema', time: '12/05/2023', value: '120 → 100' },
-        { action: 'Excepción añadida', user: 'Admin', time: '10/05/2023', value: 'Usuario ID: 45' },
-        { action: 'Configuración probada', user: 'Ana Gómez', time: '08/05/2023', value: 'Test exitoso' }
-    ];
-    
-    // Generar elementos del historial
-    historyData.forEach(item => {
-        const historyItem = document.createElement('div');
-        historyItem.className = 'history-item';
-        historyItem.innerHTML = `
-            <div class="history-details">
-                <div class="history-action">${item.action}</div>
-                <div class="history-user">Por ${item.user} • <span class="history-time">${item.time}</span></div>
-            </div>
-            <div class="history-value">${item.value}</div>
-        `;
-        historyList.appendChild(historyItem);
-    });
+    // Historial vacío o con un solo mensaje inicial
+    const historyItem = document.createElement('div');
+    historyItem.className = 'history-item';
+    historyItem.innerHTML = `
+        <div class="history-details">
+            <div class="history-action">Sistema inicializado</div>
+            <div class="history-user">Por Sistema • <span class="history-time">Justo ahora</span></div>
+        </div>
+        <div class="history-value">Todos los valores en cero</div>
+    `;
+    historyList.appendChild(historyItem);
 }
 
 function testSettings() {
-    // Simular prueba de configuración
+    // Simular prueba de configuración con valores fijos
     const newLimit = document.getElementById('maxUsuarios').value;
     const priorityMode = document.getElementById('priorityMode').value;
     
@@ -1150,22 +1125,22 @@ function testSettings() {
 function getPriorityModeName(value) {
     const modes = {
         'fifo': 'Primero en entrar, primero en salir',
-        'priority': 'Por prioridad de usuario',
-        'vip': 'Acceso VIP primero'
+        'priority': 'Por prioridad de usuario'
     };
     return modes[value] || value;
 }
 
 function confirmChanges() {
-    // Guardar los cambios
-    maxUsers = document.getElementById('maxUsuarios').value;
+    // Guardar los cambios (solo el límite máximo)
+    maxUsers = parseInt(document.getElementById('maxUsuarios').value);
+    currentUsers = 0; // Mantenemos usuarios en cero
     
     // Actualizar la interfaz
     updateUserStats();
     
     // Cerrar modal y mostrar feedback
     closeModal();
-    alert('Los cambios se han aplicado exitosamente.');
+    alert('Los cambios se han aplicado exitosamente. Usuarios activos: 0');
     
     // Añadir al historial
     addHistoryItem('Límite cambiado', maxUsers);
@@ -1196,7 +1171,7 @@ function closeModal() {
 document.getElementById('limiteForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const newLimit = document.getElementById('maxUsuarios').value;
+    const newLimit = parseInt(document.getElementById('maxUsuarios').value);
     
     if(newLimit < 1 || newLimit > 1000) {
         alert('Por favor ingrese un valor válido entre 1 y 1000');
@@ -1208,3 +1183,4 @@ document.getElementById('limiteForm').addEventListener('submit', function(e) {
     document.getElementById('modalMessage').textContent = `¿Está seguro que desea cambiar el límite máximo a ${newLimit} usuarios?`;
     document.getElementById('confirmModal').style.display = 'flex';
 });
+

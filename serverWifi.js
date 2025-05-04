@@ -19,6 +19,9 @@ const dbConfig = {
     }
 };
 
+// Variable para el contador en memoria
+let contadorLogins = 0;
+
 // Conectar a la base de datos
 async function connectDB() {
     try {
@@ -60,40 +63,43 @@ app.post('/registro', async (req, res) => {
     }
 });
 
-// Ruta para iniciar sesión (y registrar automáticamente si el usuario no existe)
+// Ruta para iniciar sesión (con conteo de logins que se actualiza)
 app.post('/login', async (req, res) => {
     const { nombre, fecha_nacimiento, correo, telefono } = req.body;
 
     try {
         const pool = await sql.connect(dbConfig);
-        // Buscar usuario por teléfono (asumiendo que es único)
         const result = await pool.request()
             .input('telefono', sql.NVarChar(20), telefono)
             .query("SELECT * FROM Usuarios WHERE telefono = @telefono");
 
         if (result.recordset.length > 0) {
-            // Existe un usuario registrado con ese teléfono, comparar los campos
             const usuario = result.recordset[0];
             if (usuario.nombre === nombre && 
                 new Date(usuario.fecha_nacimiento).toISOString().split('T')[0] === fecha_nacimiento && 
                 usuario.correo === correo && 
                 usuario.telefono === telefono) {
+                
+                contadorLogins++;
+                process.stdout.write(`\r🔢 Total de logins: ${contadorLogins}`);
                 res.json({ success: true, message: '📡 Conexión WI-FI Establecida.' });
             } else {
                 res.json({ success: false, message: '⚠️ Credenciales incorrectas.' });
             }
         } else {
-            // Usuario no existe, registrar y responder con éxito
             await pool.request()
                 .input('nombre', sql.NVarChar(100), nombre)
                 .input('fecha_nacimiento', sql.Date, fecha_nacimiento)
                 .input('correo', sql.NVarChar(100), correo)
                 .input('telefono', sql.NVarChar(20), telefono)
                 .query("INSERT INTO Usuarios (nombre, fecha_nacimiento, correo, telefono) VALUES (@nombre, @fecha_nacimiento, @correo, @telefono)");
+            
+            contadorLogins++;
+            process.stdout.write(`\r🔢 Total de logins: ${contadorLogins}`);
             res.json({ success: true, message: '📡 Conexión WI-FI Establecida.' });
         }
     } catch (error) {
-        console.error('❌ Error en el inicio de sesión:', error);
+        console.error('\n❌ Error en el inicio de sesión:', error);
         res.status(500).json({ success: false, message: 'Error en el servidor' });
     } 
 });

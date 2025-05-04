@@ -2096,6 +2096,50 @@ tr:hover {
   color: #000000;
 }
 
+.priority-options-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.priority-options {
+  margin-top: 15px;
+}
+
+.option-rectangle {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+.fifo-option {
+  border-left: 4px solid #3498db;
+}
+
+.priority-option {
+  border-left: 4px solid #2ecc71;
+}
+
+.option-title {
+  margin: 0 0 5px 0;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.option-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #666;
+}
+
+.option-rectangle:hover {
+  background-color: #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
 /* Responsive mejorado */
 @media (max-width: 1200px) {
   .limiteMaximo {

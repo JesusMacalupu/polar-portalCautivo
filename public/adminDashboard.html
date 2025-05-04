@@ -385,14 +385,25 @@
                               </div>
                           </div>
                           
-                          <div class="form-group">
-                              <label for="priorityMode">Modo de prioridad:</label>
-                              <select id="priorityMode" class="form-control">
-                                  <option value="fifo">Primero en entrar, primero en salir</option>
-                                  <option value="priority">Por prioridad de usuario</option>
-                                  <option value="vip">Acceso VIP primero</option>
-                              </select>
-                          </div>
+                          <div class="form-group priority-options-container">
+                            <label for="priorityMode">Modo de prioridad:</label>
+                            <select id="priorityMode" class="form-control">
+                                <option value="fifo">Primero en entrar, primero en salir</option>
+                                <option value="priority">Por prioridad de actividad</option>
+                            </select>
+                            
+                            <div class="priority-options">
+                                <div class="option-rectangle fifo-option">
+                                    <h4 class="option-title">Primero en entrar, primero en salir (FIFO)</h4>
+                                    <p class="option-desc">Acceso por orden de llegada. Al alcanzar el límite, nuevos usuarios esperan disponibilidad.</p>
+                                </div>
+                                
+                                <div class="option-rectangle priority-option">
+                                    <h4 class="option-title">Prioridad por actividad</h4>
+                                    <p class="option-desc">Desconexión automática de usuarios inactivos para permitir acceso a nuevos usuarios activos.</p>
+                                </div>
+                            </div>
+                        </div>
                       </div>
                       
                       <div class="status-card">
@@ -507,25 +518,25 @@
                   <div class="form-actions">
                       <button type="button" class="btn-test" onclick="testSettings()"><i class="fas fa-vial"></i> Probar configuración</button>
                       <button type="submit" class="btn-confirmar"><i class="fas fa-save"></i> Guardar cambios</button>
-                      <button type="button" class="btn-regresar" onclick="ocultarLimite()"><i class="fas fa-times"></i> Cancelar</button>
+                      <button type="button" class="btn-regresar" onclick="ocultarLimite()"><i class="fas fa-times"></i> Regresar</button>
                   </div>
               </div>
           </form>
         </div>
     </div>
   
-  <!-- Modal de confirmación -->
-  <div id="confirmModal" class="modal-administrador" style="display: none;">
-    <div class="modal-administrador-content">
-      <span class="close-modal" onclick="closeModal()">&times;</span>
-      <h3 id="modalTitle">Confirmar cambios</h3>
-      <p id="modalMessage">¿Está seguro que desea aplicar estos cambios?</p>
-      <div class="modal-administrador-actions">
-        <button class="btn-confirmar" onclick="confirmChanges()">Confirmar</button>
-        <button class="btn-regresar" onclick="closeModal()">Cancelar</button>
+    <!-- Modal de confirmación -->
+    <div id="confirmModal" class="modal-administrador" style="display: none;">
+      <div class="modal-administrador-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h3 id="modalTitle">Confirmar cambios</h3>
+        <p id="modalMessage">¿Está seguro que desea aplicar estos cambios?</p>
+        <div class="modal-administrador-actions">
+          <button class="btn-confirmar" onclick="confirmChanges()">Confirmar</button>
+          <button class="btn-regresar" onclick="closeModal()">Cancelar</button>
+        </div>
       </div>
     </div>
-  </div>  
 
       <div id="metricasRed" class="card-perfiles">
         <h1>Métricas de Uso de la Red</h1>
